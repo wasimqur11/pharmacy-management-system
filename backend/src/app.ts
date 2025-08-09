@@ -49,9 +49,11 @@ app.get('/health', (req, res) => {
 
 // Import routes
 import authRoutes from './routes/authRoutes';
+import adminRoutes from './routes/adminRoutes';
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use('/api', (req, res) => {
   res.status(200).json({

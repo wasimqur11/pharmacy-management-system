@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import AdminPanel from './components/AdminPanel';
 
 // Modern color palette and design system
 const colors = {
@@ -321,6 +322,8 @@ const LoginForm = ({ onLogin, loading }: { onLogin: (email: string, password: st
 
 // Dashboard Component
 const Dashboard = ({ user, onLogout }: { user: any, onLogout: () => void }) => {
+  const [activeView, setActiveView] = useState<'dashboard' | 'admin'>('dashboard');
+  
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -330,7 +333,7 @@ const Dashboard = ({ user, onLogout }: { user: any, onLogout: () => void }) => {
       {/* Header */}
       <div style={{ 
         background: colors.bgCard,
-        padding: '20px 40px', 
+        padding: '16px 32px', 
         borderBottom: 'none',
         display: 'flex',
         justifyContent: 'space-between',
@@ -338,9 +341,9 @@ const Dashboard = ({ user, onLogout }: { user: any, onLogout: () => void }) => {
         backdropFilter: 'blur(10px)',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ 
-            fontSize: '32px',
+            fontSize: '28px',
             background: colors.bgPrimary,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -351,25 +354,62 @@ const Dashboard = ({ user, onLogout }: { user: any, onLogout: () => void }) => {
           <h1 style={{ 
             color: colors.textPrimary, 
             margin: 0,
-            fontSize: '24px',
+            fontSize: '20px',
             fontWeight: '700',
             letterSpacing: '-0.5px'
           }}>
             Pharmacy Management
           </h1>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Navigation for Admin */}
+          {user.role === 'admin' && (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => setActiveView('dashboard')}
+                style={{
+                  padding: '8px 16px',
+                  background: activeView === 'dashboard' ? colors.bgPrimary : 'transparent',
+                  color: activeView === 'dashboard' ? colors.textWhite : colors.textSecondary,
+                  border: activeView === 'dashboard' ? 'none' : `1px solid ${colors.borderDark}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                📊 Dashboard
+              </button>
+              <button
+                onClick={() => setActiveView('admin')}
+                style={{
+                  padding: '8px 16px',
+                  background: activeView === 'admin' ? colors.bgPrimary : 'transparent',
+                  color: activeView === 'admin' ? colors.textWhite : colors.textSecondary,
+                  border: activeView === 'admin' ? 'none' : `1px solid ${colors.borderDark}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                ⚙️ Admin
+              </button>
+            </div>
+          )}
           <div style={{ textAlign: 'right' }}>
             <div style={{ 
               color: colors.textPrimary, 
-              fontSize: '16px',
+              fontSize: '14px',
               fontWeight: '600'
             }}>
               Welcome, {user.firstName} {user.lastName}
             </div>
             <div style={{ 
               color: colors.textSecondary, 
-              fontSize: '13px',
+              fontSize: '12px',
               fontWeight: '500',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
@@ -407,63 +447,66 @@ const Dashboard = ({ user, onLogout }: { user: any, onLogout: () => void }) => {
       </div>
 
       {/* Main Content */}
-      <div style={{ padding: '40px' }}>
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ 
-            color: colors.textPrimary, 
-            marginBottom: '8px',
-            fontSize: '32px',
-            fontWeight: '700',
-            letterSpacing: '-0.5px'
-          }}>
-            Dashboard
-          </h2>
-          <p style={{ 
-            color: colors.textSecondary, 
-            fontSize: '16px',
-            margin: 0
-          }}>
-            Overview of your pharmacy operations
-          </p>
-        </div>
+      {activeView === 'admin' ? (
+        <AdminPanel />
+      ) : (
+        <div style={{ padding: '24px' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <h2 style={{ 
+              color: colors.textPrimary, 
+              marginBottom: '4px',
+              fontSize: '24px',
+              fontWeight: '700',
+              letterSpacing: '-0.5px'
+            }}>
+              Dashboard
+            </h2>
+            <p style={{ 
+              color: colors.textSecondary, 
+              fontSize: '14px',
+              margin: 0
+            }}>
+              Overview of your pharmacy operations
+            </p>
+          </div>
         
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-          gap: '24px',
-          marginBottom: '40px'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+          gap: '16px',
+          marginBottom: '24px'
         }}>
           {[
-            { title: 'Today\'s Sales', value: '₹0', icon: '💰', color: colors.success },
-            { title: 'Consultations', value: '0', icon: '👨‍⚕️', color: colors.primary },
-            { title: 'Low Stock Items', value: '0', icon: '📦', color: colors.warning },
-            { title: 'Pending Orders', value: '0', icon: '⏳', color: colors.secondary }
+            { title: 'Today\'s Sales', value: '₹0', icon: '💰', color: colors.success, subtitle: 'vs yesterday' },
+            { title: 'Consultations', value: '0', icon: '👨‍⚕️', color: colors.primary, subtitle: 'scheduled today' },
+            { title: 'Low Stock Items', value: '0', icon: '📦', color: colors.warning, subtitle: 'need reorder' },
+            { title: 'Pending Orders', value: '0', icon: '⏳', color: colors.secondary, subtitle: 'awaiting delivery' }
           ].map((item, index) => (
             <div key={item.title} style={{ 
               background: colors.bgCard,
-              padding: '32px 28px', 
-              borderRadius: '20px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              padding: '20px 16px', 
+              borderRadius: '16px',
+              boxShadow: '0 6px 24px rgba(0, 0, 0, 0.08)',
               backdropFilter: 'blur(10px)',
               border: `1px solid ${colors.borderDark}`,
               transition: 'all 0.3s ease',
               cursor: 'pointer'
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.12)';
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+              e.currentTarget.style.boxShadow = '0 6px 24px rgba(0, 0, 0, 0.08)';
             }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <div style={{ 
-                  fontSize: '32px',
-                  width: '56px',
-                  height: '56px',
-                  borderRadius: '16px',
+                  fontSize: '24px',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '12px',
                   background: `linear-gradient(135deg, ${item.color}20 0%, ${item.color}40 100%)`,
                   display: 'flex',
                   alignItems: 'center',
@@ -471,89 +514,163 @@ const Dashboard = ({ user, onLogout }: { user: any, onLogout: () => void }) => {
                 }}>
                   {item.icon}
                 </div>
+                <div style={{ 
+                  fontSize: '28px', 
+                  fontWeight: '700', 
+                  color: colors.textPrimary,
+                  letterSpacing: '-0.5px'
+                }}>
+                  {item.value}
+                </div>
               </div>
               <h3 style={{ 
-                color: colors.textSecondary, 
+                color: colors.textPrimary, 
                 fontSize: '14px', 
-                marginBottom: '12px', 
-                textTransform: 'uppercase',
+                marginBottom: '2px', 
                 fontWeight: '600',
-                letterSpacing: '0.5px'
+                letterSpacing: '0px'
               }}>
                 {item.title}
               </h3>
               <p style={{ 
-                color: colors.textPrimary, 
-                fontSize: '36px', 
-                fontWeight: '700', 
+                color: colors.textSecondary, 
+                fontSize: '12px', 
                 margin: 0,
-                letterSpacing: '-1px'
+                fontWeight: '500'
               }}>
-                {item.value}
+                {item.subtitle}
               </p>
             </div>
           ))}
         </div>
 
         <div style={{ 
-          background: colors.bgCard,
-          padding: '32px', 
-          borderRadius: '20px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          backdropFilter: 'blur(10px)',
-          border: `1px solid ${colors.borderDark}`
+          display: 'grid',
+          gridTemplateColumns: '2fr 1fr',
+          gap: '20px'
         }}>
-          <h3 style={{ 
-            color: colors.textPrimary, 
-            marginBottom: '24px',
-            fontSize: '24px',
-            fontWeight: '700',
-            letterSpacing: '-0.5px'
+          {/* Quick Actions */}
+          <div style={{ 
+            background: colors.bgCard,
+            padding: '24px', 
+            borderRadius: '16px',
+            boxShadow: '0 6px 24px rgba(0, 0, 0, 0.08)',
+            backdropFilter: 'blur(10px)',
+            border: `1px solid ${colors.borderDark}`
           }}>
-            Quick Actions
-          </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-            {[
-              { name: 'New Sale', icon: '🛒', color: colors.primary },
-              { name: 'Add Product', icon: '📝', color: colors.success },
-              { name: 'Book Consultation', icon: '🩺', color: colors.secondary },
-              { name: 'View Reports', icon: '📊', color: colors.warning }
-            ].map((action) => (
-              <button
-                key={action.name}
-                style={{
-                  padding: '20px 24px',
-                  background: `linear-gradient(135deg, ${action.color} 0%, ${action.color}CC 100%)`,
-                  color: colors.textWhite,
-                  border: 'none',
-                  borderRadius: '16px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  transition: 'all 0.3s ease',
-                  transform: 'translateY(-1px)',
-                  boxShadow: `0 6px 20px ${action.color}40`
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.transform = 'translateY(-3px)';
-                  e.target.style.boxShadow = `0 8px 25px ${action.color}50`;
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.transform = 'translateY(-1px)';
-                  e.target.style.boxShadow = `0 6px 20px ${action.color}40`;
-                }}
-                onClick={() => alert(`${action.name} - Coming soon!`)}
-              >
-                <span style={{ fontSize: '20px' }}>{action.icon}</span>
-                {action.name}
-              </button>
-            ))}
+            <h3 style={{ 
+              color: colors.textPrimary, 
+              marginBottom: '16px',
+              fontSize: '18px',
+              fontWeight: '700',
+              letterSpacing: '-0.5px'
+            }}>
+              Quick Actions
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
+              {[
+                { name: 'New Sale', icon: '🛒', color: colors.primary },
+                { name: 'Add Product', icon: '📝', color: colors.success },
+                { name: 'Book Consultation', icon: '🩺', color: colors.secondary },
+                { name: 'View Reports', icon: '📊', color: colors.warning }
+              ].map((action) => (
+                <button
+                  key={action.name}
+                  style={{
+                    padding: '14px 18px',
+                    background: `linear-gradient(135deg, ${action.color} 0%, ${action.color}CC 100%)`,
+                    color: colors.textWhite,
+                    border: 'none',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'all 0.3s ease',
+                    transform: 'translateY(0px)',
+                    boxShadow: `0 4px 16px ${action.color}30`
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = `0 6px 20px ${action.color}40`;
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.transform = 'translateY(0px)';
+                    e.target.style.boxShadow = `0 4px 16px ${action.color}30`;
+                  }}
+                  onClick={() => alert(`${action.name} - Coming soon!`)}
+                >
+                  <span style={{ fontSize: '18px' }}>{action.icon}</span>
+                  {action.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div style={{ 
+            background: colors.bgCard,
+            padding: '24px', 
+            borderRadius: '16px',
+            boxShadow: '0 6px 24px rgba(0, 0, 0, 0.08)',
+            backdropFilter: 'blur(10px)',
+            border: `1px solid ${colors.borderDark}`
+          }}>
+            <h3 style={{ 
+              color: colors.textPrimary, 
+              marginBottom: '16px',
+              fontSize: '18px',
+              fontWeight: '700',
+              letterSpacing: '-0.5px'
+            }}>
+              Recent Activity
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {[
+                { action: 'Sale completed', time: '2 min ago', type: 'success' },
+                { action: 'New patient registered', time: '5 min ago', type: 'info' },
+                { action: 'Stock low alert', time: '10 min ago', type: 'warning' },
+                { action: 'Consultation scheduled', time: '15 min ago', type: 'info' }
+              ].map((activity, index) => (
+                <div key={index} style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px',
+                  padding: '8px 0',
+                  borderBottom: index < 3 ? `1px solid ${colors.borderDark}` : 'none'
+                }}>
+                  <div style={{ 
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: activity.type === 'success' ? colors.success : 
+                                   activity.type === 'warning' ? colors.warning : colors.primary,
+                    flexShrink: 0
+                  }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ 
+                      fontSize: '12px', 
+                      fontWeight: '500',
+                      color: colors.textPrimary 
+                    }}>
+                      {activity.action}
+                    </div>
+                    <div style={{ 
+                      fontSize: '11px', 
+                      color: colors.textSecondary 
+                    }}>
+                      {activity.time}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

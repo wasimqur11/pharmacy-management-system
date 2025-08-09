@@ -131,6 +131,25 @@ export const initializeDatabase = async (): Promise<void> => {
       )
     `);
     
+    // Create pharmacy configuration table
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS pharmacy_config (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        pharmacy_name TEXT NOT NULL,
+        address TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        email TEXT NOT NULL,
+        license_number TEXT NOT NULL,
+        registration_number TEXT NOT NULL,
+        owner_name TEXT NOT NULL,
+        working_hours TEXT NOT NULL, -- JSON string
+        currency TEXT NOT NULL DEFAULT 'INR',
+        tax_rate REAL NOT NULL DEFAULT 18.0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Insert default admin user
     const adminExists = await dbGet('SELECT id FROM users WHERE email = ?', ['admin@pharmacy.com']);
     if (!adminExists) {
